@@ -60,6 +60,8 @@ export default function Map() {
   const [nearestShelter, setNearestShelter] =
     useState<any>(null);
 
+  const [isFindingLocation, setIsFindingLocation] =
+    useState(false);  
   useEffect(() => {
     fetch("/seoul-gu.geojson")
       .then((res) => res.json())
@@ -136,6 +138,8 @@ export default function Map() {
       return;
     }
 
+    setIsFindingLocation(true);
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat =
@@ -149,11 +153,15 @@ export default function Map() {
         setSearchLocation(null);
 
         findNearestShelter(lat, lng);
+
+        setIsFindingLocation(false);
       },
       () => {
         alert(
           "위치 정보를 가져올 수 없습니다."
         );
+        setIsFindingLocation(false);
+        
       }
     );
   };
@@ -294,8 +302,23 @@ export default function Map() {
             boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
           }}
         >
-          📍 내 위치 찾기
+          {isFindingLocation
+            ? "📍 위치 확인 중..."
+            : "📍 내 위치 찾기"}
         </button>
+        {isFindingLocation && (
+          <div
+            style={{
+              padding: "10px 14px",
+              backgroundColor: "#eef7ff",
+              borderRadius: "8px",
+              fontWeight: "bold",
+              color: "#0077cc",
+            }}
+          >
+            📍 현재 위치를 확인하고 있습니다...
+          </div>
+        )}
 
         <div
   style={{
